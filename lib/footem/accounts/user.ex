@@ -3,6 +3,12 @@ defmodule Footem.Accounts.User do
   import Ecto.Changeset
 
   @roles ~w(user admin superadmin)
+  @role_permissions %{
+    "user" => ~w(view_users view_profits),
+    "admin" => ~w(view_users view_profits configure_games grant_admin_access),
+    "superadmin" => ~w(view_users view_profits configure_games grant_admin_access revoke_admin_access)
+  }
+
   schema "users" do
     field :email, :string
     field :first_name, :string
@@ -14,6 +20,9 @@ defmodule Footem.Accounts.User do
     field :confirmed_at, :utc_datetime
     field :role , :string, default: "user"
     field :wallet, :decimal, default: 200.0
+    field :custom_permissions, :map, default: %{}
+
+    has_many :bets, Footem.Accounts.Bet
 
     timestamps(type: :utc_datetime)
   end
@@ -61,6 +70,17 @@ defmodule Footem.Accounts.User do
     |> validate_number(:wallet, greater_than_or_equal_to: 0)
   end
 
+  def custom_permissions_changeset(user, attrs) do
+  user
+  |> cast(attrs, [:custom_permissions])
+  |> validate_permissions()
+  end
+
+  defp validate_permissions(changeset) do
+    changeset
+    |> validate_subset(:custom_permissions, ~w(view_users soft_delete_user view_profits configure_games grant_admin_access revoke_admin_access))
+  end
+
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])
@@ -73,10 +93,9 @@ defmodule Footem.Accounts.User do
     changeset
     |> validate_required([:password])
     |> validate_length(:password, min: 12, max: 72)
-    # Examples of additional password validation:
-    # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
-    # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
-    # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+    |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
+    |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
+    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
     |> maybe_hash_password(opts)
   end
 
@@ -176,5 +195,9 @@ defmodule Footem.Accounts.User do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+  def has_permission?(%Footem.Accounts.User{role: role}, permission) do
+    permissions = Map.get(@role_permissions, role, [])
+    permission in permissions
   end
 end

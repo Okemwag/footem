@@ -9,8 +9,8 @@ defmodule Footem.Accounts.Bet do
     field :potential_winnings, :decimal
     field :odds, :decimal
 
-    belongs_to :user, Accounts.User
-    belongs_to :game, Sports.Game
+    belongs_to :user, Footem.Accounts.User
+    belongs_to :game, Footem.Sports.Game
 
     timestamps(type: :utc_datetime)
   end

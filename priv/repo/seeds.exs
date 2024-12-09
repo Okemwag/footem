@@ -10,16 +10,42 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-defmodule Footem.Repo.Seeds do
+defmodule Footem.Repo.Migrations.SeedAdminAndSuperadmin do
+  use Ecto.Migration
+
+  alias Footem.Repo
   alias Footem.Accounts.User
 
-  def seed_admin_user do
-    %User{}
-    |> User.changeset(%{
-      email: "info@admin.footem",
-      password: "Meta2Pl0it",
-      role: "admin"
+  def up do
+    Repo.insert!(%User{
+      email: "admin@footem.com",
+      first_name: "Admin",
+      last_name: "User",
+      role: "admin",
+      custom_permissions: %{
+        "view_users" => true,
+        "soft_delete_user" => true,
+        "view_profits" => true
+      },
+      hashed_password: Bcrypt.hash_pwd_salt("M3taS3cur3P@ssw0rd")
     })
-    |> Footem.Repo.insert!()
+
+    Repo.insert!(%User{
+      email: "superadmin@footem.com",
+      first_name: "Super",
+      last_name: "Admin",
+      role: "superadmin",
+      custom_permissions: %{
+        "configure_games" => true,
+        "grant_admin_access" => true,
+        "revoke_admin_access" => true
+      },
+      hashed_password: Bcrypt.hash_pwd_salt("M3taS3cur3P@ssw0rd")
+    })
+  end
+
+  def down do
+    Repo.delete_all(User, email: "admin@footem.com")
+    Repo.delete_all(User, email: "superadmin@footem.com")
   end
 end
