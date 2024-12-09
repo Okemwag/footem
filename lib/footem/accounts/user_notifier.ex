@@ -76,4 +76,32 @@ defmodule Footem.Accounts.UserNotifier do
     ==============================
     """)
   end
+
+  @doc """
+Delivers instructions to confirm a loss of a bet to a user, including details of the bet and its status.
+"""
+  def deliver_confirm_loss_instructions(user, bet) do
+    email_body = """
+
+    ==============================
+
+    Hi #{user.email},
+
+    Here are the details of your bet:
+
+    - Bet Type: #{bet.bet_type}
+    - Bet Amount: #{bet.bet_amount}
+    - Odds: #{bet.odds}
+    - Potential Winnings: #{bet.potential_winnings}
+    - Status: #{bet.status}
+
+    If you didn't place this bet or request this confirmation, please ignore this email.
+
+    ==============================
+    """
+
+    deliver(user.email, "Confirm Loss Instructions", email_body)
+  end
+
+
 end

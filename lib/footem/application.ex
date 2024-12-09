@@ -10,6 +10,7 @@ defmodule Footem.Application do
     children = [
       FootemWeb.Telemetry,
       Footem.Repo,
+      {Oban, Application.fetch_env!(:footem, Oban)},
       {DNSCluster, query: Application.get_env(:footem, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Footem.PubSub},
       # Start the Finch HTTP client for sending emails
