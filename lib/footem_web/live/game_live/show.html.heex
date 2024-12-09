@@ -1,0 +1,33 @@
+<.header>
+  Game <%= @game.id %>
+  <:subtitle>This is a game record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/games/#{@game}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit game</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Sport type"><%= @game.sport_type %></:item>
+  <:item title="Home team"><%= @game.home_team %></:item>
+  <:item title="Away team"><%= @game.away_team %></:item>
+  <:item title="Start time"><%= @game.start_time %></:item>
+  <:item title="Status"><%= @game.status %></:item>
+  <:item title="Home team odds"><%= @game.home_team_odds %></:item>
+  <:item title="Away team odds"><%= @game.away_team_odds %></:item>
+  <:item title="Draw odds"><%= @game.draw_odds %></:item>
+</.list>
+
+<.back navigate={~p"/games"}>Back to games</.back>
+
+<.modal :if={@live_action == :edit} id="game-modal" show on_cancel={JS.patch(~p"/games/#{@game}")}>
+  <.live_component
+    module={FootemWeb.GameLive.FormComponent}
+    id={@game.id}
+    title={@page_title}
+    action={@live_action}
+    game={@game}
+    patch={~p"/games/#{@game}"}
+  />
+</.modal>
