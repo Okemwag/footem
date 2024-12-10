@@ -1,5 +1,5 @@
 <.header>
-  Listing Games
+  Latest in Sports
   <:actions>
     <.link patch={~p"/games/new"}>
       <.button>New Game</.button>
@@ -31,7 +31,6 @@
       phx-click={JS.push("delete", value: %{id: game.id}) |> hide("##{id}")}
       data-confirm="Are you sure?"
     >
-      Delete
     </.link>
   </:action>
 </.table>
