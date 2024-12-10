@@ -21,9 +21,11 @@ defmodule FootemWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/admin", AdminLive.Index, :index
     live "/games", GameLive.Index, :index
     live "/games/new", GameLive.Index, :new
     live "/games/:id/edit", GameLive.Index, :edit
+
 
     live "/games/:id", GameLive.Show, :show
     live "/games/:id/show/edit", GameLive.Show, :edit

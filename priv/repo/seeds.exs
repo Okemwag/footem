@@ -17,6 +17,7 @@ defmodule Footem.Repo.Migrations.SeedAdminAndSuperadmin do
   alias Footem.Accounts.User
 
   def up do
+    # Insert Admin user
     Repo.insert!(%User{
       email: "admin@footem.com",
       first_name: "Admin",
@@ -30,6 +31,7 @@ defmodule Footem.Repo.Migrations.SeedAdminAndSuperadmin do
       hashed_password: Bcrypt.hash_pwd_salt("M3taS3cur3P@ssw0rd")
     })
 
+    # Insert Superadmin user
     Repo.insert!(%User{
       email: "superadmin@footem.com",
       first_name: "Super",
@@ -45,7 +47,7 @@ defmodule Footem.Repo.Migrations.SeedAdminAndSuperadmin do
   end
 
   def down do
-    Repo.delete_all(User, email: "admin@footem.com")
-    Repo.delete_all(User, email: "superadmin@footem.com")
+    Repo.delete_all(User, where: [email: "admin@footem.com"])
+    Repo.delete_all(User, where: [email: "superadmin@footem.com"])
   end
 end

@@ -1,0 +1,13 @@
+<.header>
+  Place Bet for <%= @game.home_team %> vs <%= @game.away_team %>
+  <:subtitle>Game starts at: <%= @game.start_time %></:subtitle>
+</.header>
+
+<.live_component
+  module={FootemWeb.BetLive.FormComponent}
+  id={:new}
+  current_user={@current_user}
+  game={@game}
+  action={:new}
+  return_to={~p"/games/#{@game}"}
+/>

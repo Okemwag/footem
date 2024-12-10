@@ -1,3 +1,4 @@
+# lib/footem_web/live/game_live/form_component.ex
 defmodule FootemWeb.GameLive.FormComponent do
   use FootemWeb, :live_component
 

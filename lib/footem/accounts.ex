@@ -267,6 +267,10 @@ defmodule Footem.Accounts do
     end
   end
 
+  def list_users do
+    Repo.all(User)
+  end
+
   @doc """
   Confirms a user by the given token.
 
@@ -400,6 +404,13 @@ defmodule Footem.Accounts do
     |> Repo.insert()
   end
 
+  def update_user_role(%User{} = user, role) do
+    user
+    |> Ecto.Changeset.change(role: role)
+    |> Repo.update()
+  end
+
+
   @doc """
   Updates a bet.
 
@@ -446,4 +457,5 @@ defmodule Footem.Accounts do
   def change_bet(%Bet{} = bet, attrs \\ %{}) do
     Bet.changeset(bet, attrs)
   end
+  
 end

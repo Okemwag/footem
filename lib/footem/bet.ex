@@ -1,5 +1,6 @@
 defmodule Accounts.BetService do
   alias Footem.Accounts.{User, Bet}
+  alias Footem.Workers.BetNotificationWorker
   alias Footem.Repo
 
   def place_bet(user, game, bet_params) do
@@ -54,6 +55,8 @@ defmodule Accounts.BetService do
 
   def settle_bet(bet, result) do
     Repo.transaction(fn ->
+      bet = Repo.preload(bet, :user)
+
       cond do
         result == bet.bet_type ->
           # Winning bet - credit potential winnings
@@ -69,9 +72,16 @@ defmodule Accounts.BetService do
 
         true ->
           # Losing bet - already deducted initial amount
-          bet
+          updated_bet = bet
           |> Bet.changeset(%{status: "lost"})
           |> Repo.update!()
+
+          # Queue email notification
+          %{bet_id: updated_bet.id}
+          |> BetNotificationWorker.new()
+          |> Oban.insert()
+
+          updated_bet
       end
     end)
   end

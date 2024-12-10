@@ -76,6 +76,7 @@ defmodule Footem.Sports do
     |> Repo.update()
   end
 
+
   @doc """
   Deletes a game.
 
@@ -103,5 +104,59 @@ defmodule Footem.Sports do
   """
   def change_game(%Game{} = game, attrs \\ %{}) do
     Game.changeset(game, attrs)
+  end
+  @doc """
+  Creates a game with admin privileges.
+  Only admins and superadmins should be able to call this function.
+
+  ## Examples
+
+      iex> create_game_as_admin(%{field: value}, admin_user)
+      {:ok, %Game{}}
+
+      iex> create_game_as_admin(%{field: bad_value}, admin_user)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_game_as_admin(attrs \\ %{}, user) when user.role in ["admin", "superadmin"] do
+    %Game{}
+    |> Game.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a game with admin privileges.
+  Only admins and superadmins should be able to call this function.
+
+  ## Examples
+
+      iex> update_game_as_admin(game, %{field: new_value}, admin_user)
+      {:ok, %Game{}}
+
+      iex> update_game_as_admin(game, %{field: bad_value}, admin_user)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_game_as_admin(%Game{} = game, attrs, user) when user.role in ["admin", "superadmin"] do
+    game
+    |> Game.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a game with admin privileges.
+  Only admins and superadmins should be able to call this function.
+
+  ## Examples
+
+      iex> delete_game_as_admin(game, admin_user)
+      {:ok, %Game{}}
+
+      iex> delete_game_as_admin(game, admin_user)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_game_as_admin(%Game{} = game, user) when user.role in ["admin", "superadmin"] do
+    Repo.delete(game)
   end
 end
