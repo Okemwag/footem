@@ -17,7 +17,7 @@ defmodule FootemWeb.AdminLive.Index do
       |> assign(:current_user, current_user)
       |> assign(:users, users)
       |> assign(:games, games)
-      |> assign(:profits, profits)  # Assign the calculated profits
+      |> assign(:profits, profits)
       |> assign(:page_title, "Admin Dashboard")
       |> assign(:selected_tab, "games")
       |> assign(:show_new_game_form, false)}
@@ -89,6 +89,23 @@ defmodule FootemWeb.AdminLive.Index do
          |> assign(:games, Sports.list_games())}
     end
   end
+  
+  def handle_event("delete-user", %{"user-id" => user_id}, socket) do
+  user_id = String.to_integer(user_id)
+
+  # Delete the user from the database
+  case Accounts.delete_user(user_id) do
+    :ok ->
+      # Reload users after deletion
+      users = Accounts.list_users()
+      {:noreply, assign(socket, users: users)}
+
+    {:error, _reason} ->
+      {:noreply,
+       put_flash(socket, :error, "Failed to delete user. Please try again.")}
+  end
+end
+
 
   @impl true
   def handle_event("delete-game", %{"game-id" => game_id}, socket) do

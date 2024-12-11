@@ -8,28 +8,12 @@ defmodule Footem.Accounts.Profits do
   The profit is the total winnings minus the total bet amount.
   """
   def calculate_user_profit(user_id) do
-    user_bets = Repo.all(from b in Bet, where: b.user_id == ^user_id)
+     Repo.all(from b in Bet, where: b.user_id == ^user_id , where: b.status != "won", select: %{
+      bet_amount: b.bet_amount,
+      odds: b.odds,
+      status: b.status,
+      profit: b.bet_amount * b.odds
+    })
 
-    total_bet_amount = Enum.reduce(user_bets, Decimal.new(0), fn bet, acc ->
-      Decimal.add(acc, bet.bet_amount)
-    end)
-
-    total_potential_winnings = Enum.reduce(user_bets, Decimal.new(0), fn bet, acc ->
-      Decimal.add(acc, bet.potential_winnings)
-    end)
-
-    # Use status to determine losses
-    total_losses = Enum.reduce(user_bets, Decimal.new(0), fn bet, acc ->
-      if bet.status == "lost" do
-        Decimal.add(acc, bet.bet_amount)
-      else
-        acc
-      end
-    end)
-
-    total_winnings = Decimal.sub(total_potential_winnings, total_losses)
-    profit = Decimal.sub(total_winnings, total_bet_amount)
-
-    profit
   end
 end

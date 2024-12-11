@@ -69,6 +69,12 @@ defmodule Footem.Accounts.User do
     |> validate_required([:wallet])
     |> validate_number(:wallet, greater_than_or_equal_to: 0)
   end
+  def balance_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:wallet])
+    |> validate_required([:wallet])
+    |> validate_number(:wallet, greater_than_or_equal_to: 0)
+  end
 
   def custom_permissions_changeset(user, attrs) do
   user

@@ -17,5 +17,5 @@ defmodule FootemWeb.GameLive.Show do
   end
 
   defp page_title(:show), do: "Show Game"
-  defp page_title(:edit), do: "Edit Game"
+  defp page_title(:edit), do: "Place Bet"
 end

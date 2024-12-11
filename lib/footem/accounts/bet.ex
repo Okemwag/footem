@@ -4,9 +4,8 @@ defmodule Footem.Accounts.Bet do
 
   schema "bets" do
     field :status, :string
-    field :bet_type, :string
+    field :result, :string
     field :bet_amount, :decimal
-    field :potential_winnings, :decimal
     field :odds, :decimal
 
     belongs_to :user, Footem.Accounts.User
@@ -18,7 +17,16 @@ defmodule Footem.Accounts.Bet do
   @doc false
   def changeset(bet, attrs) do
     bet
-    |> cast(attrs, [:bet_type, :bet_amount, :potential_winnings, :odds, :status])
-    |> validate_required([:bet_type, :bet_amount, :potential_winnings, :odds, :status])
+    |> cast(attrs, [:bet_amount, :odds, :status])
+    |> validate_required([:bet_amount, :odds, :status])
+  end
+
+  @doc """
+  A bet changeset for creating a bet.
+  """
+  def create_changeset(bet, attrs) do
+    bet
+    |> changeset(attrs)
+    |> validate_required([:game_id, :user_id])
   end
 end

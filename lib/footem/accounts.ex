@@ -271,6 +271,16 @@ defmodule Footem.Accounts do
     Repo.all(User)
   end
 
+  def delete_user(user_id) do
+    user = Repo.get!(User, user_id)
+
+    case Repo.delete(user) do
+      {:ok, _struct} -> :ok
+      {:error, _changeset} -> {:error, "Failed to delete user"}
+    end
+  end
+
+
   @doc """
   Confirms a user by the given token.
 
@@ -457,5 +467,5 @@ defmodule Footem.Accounts do
   def change_bet(%Bet{} = bet, attrs \\ %{}) do
     Bet.changeset(bet, attrs)
   end
-  
+
 end

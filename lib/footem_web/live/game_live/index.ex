@@ -16,7 +16,7 @@ defmodule FootemWeb.GameLive.Index do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
-    |> assign(:page_title, "Edit Game")
+    |> assign(:page_title, "Place Bet")
     |> assign(:game, Sports.get_game!(id))
   end
 

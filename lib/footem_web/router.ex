@@ -22,8 +22,8 @@ defmodule FootemWeb.Router do
 
     get "/", PageController, :home
     live "/admin", AdminLive.Index, :index
+    live "/games/new", AdminLive.Index, :new
     live "/games", GameLive.Index, :index
-    live "/games/new", GameLive.Index, :new
     live "/games/:id/edit", GameLive.Index, :edit
 
     live "/games/:id", GameLive.Show, :show

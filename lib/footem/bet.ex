@@ -1,6 +1,5 @@
-defmodule Accounts.BetService do
+defmodule Footem.Accounts.BetService do
   alias Footem.Accounts.{User, Bet}
-  alias Footem.Workers.BetNotificationWorker
   alias Footem.Repo
 
   def place_bet(user, game, bet_params) do
@@ -24,6 +23,8 @@ defmodule Accounts.BetService do
           odds: odds
         }))
         |> Repo.insert!()
+
+        {:ok, :bet_placed}
       else
         {:error, reason} -> Repo.rollback(reason)
       end
@@ -39,50 +40,20 @@ defmodule Accounts.BetService do
     end
   end
 
-  defp validate_game_odds(game, %{bet_type: bet_type}) do
-    case bet_type do
-      "home_team" -> {:ok, game.home_team_odds}
-      "away_team" -> {:ok, game.away_team_odds}
-      "draw" -> {:ok, game.draw_odds}
-      _ -> {:error, "Invalid bet type"}
-    end
+  defp validate_game_odds(game, %{result: result}) do
+    odds =
+      case result do
+        "Home" -> game.home_team_odds
+        "Draw" -> game.draw_odds
+        "Away" -> game.away_team_odds
+        _ -> nil
+      end
+
+    if odds, do: {:ok, odds}, else: {:error, "Invalid bet result"}
   end
 
   defp calculate_potential_winnings(bet_amount, odds) do
     potential_winnings = Decimal.mult(bet_amount, odds)
     {:ok, potential_winnings}
-  end
-
-  def settle_bet(bet, result) do
-    Repo.transaction(fn ->
-      bet = Repo.preload(bet, :user)
-
-      cond do
-        result == bet.bet_type ->
-          # Winning bet - credit potential winnings
-          bet.user
-          |> User.wallet_changeset(%{
-            wallet: Decimal.add(bet.user.wallet, bet.potential_winnings)
-          })
-          |> Repo.update!()
-
-          bet
-          |> Bet.changeset(%{status: "won"})
-          |> Repo.update!()
-
-        true ->
-          # Losing bet - already deducted initial amount
-          updated_bet = bet
-          |> Bet.changeset(%{status: "lost"})
-          |> Repo.update!()
-
-          # Queue email notification
-          %{bet_id: updated_bet.id}
-          |> BetNotificationWorker.new()
-          |> Oban.insert()
-
-          updated_bet
-      end
-    end)
   end
 end
